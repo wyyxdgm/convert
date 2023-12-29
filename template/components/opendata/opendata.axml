@@ -1,0 +1,23 @@
+<view class="{{className?'havaclass':'noneclass'}}">
+  <view a:if="{{ type!='blank' &&type==='userAvatarUrl'}}"  class="imageclass">
+    <image  a:if="{{ default }}"   src="{{avatar}}" class="cover-image" />
+    <text a:else class="text-style">{{defaultText}}</text>
+  </view>
+  <!-- <image a:if="{{ type!='blank' &&type==='userAvatarUrl'}}" src="{{avatar}}" class="{{className}}" /> -->
+  <!--<text class="nickname">{{nickName}}</text> -->
+  <text a:if="{{ type!='blank' &&type==='userNickName' }}" class="{{className}}" lang="en">
+    {{nickName}}
+  </text>
+  <text a:if="{{ type!='blank' &&type==='userCity' }}" class="{{className}}">
+    {{city}}
+  </text>
+  <text a:if="{{ type!='blank' &&type==='userProvince'}}" class="{{className}}">
+    {{province}}
+  </text>
+  <text a:if="{{ type!='blank' &&type==='userCountry'}}" class="{{className}}">
+    {{country}}
+  </text>
+  <text a:if="{{ type!='blank' &&type==='userLanguage'}}" class="{{className}}">
+    {{language}}
+  </text>
+</view>
