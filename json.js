@@ -49,8 +49,7 @@ module.exports = [
                 resolveMiniProgramRelationTargetDir(c.to, ctx.config.targetDir) + "/" + vv;
               if (ctx.config.verbose)
                 console.log(`[json]替换miniprogram_npm依赖`, `${vv} -> ${obj.usingComponents[originalComponentName]}`);
-            }
-            if (topLevelFolderName === "weui-miniprogram") {
+            } else if (topLevelFolderName === "weui-miniprogram") { // 针对本项目制定修复路径
               obj.usingComponents[originalComponentName] =
                 resolveRelationTargetDir(c.to, ctx.config.targetDir + "/" + "packageExtend/components") +
                 "/" +
