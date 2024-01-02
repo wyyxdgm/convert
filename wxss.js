@@ -20,17 +20,20 @@ module.exports = [
       c.ast = csstree.parse(css);
       csstree.walk(c.ast, function (node) {
         if (node.type === "AtrulePrelude") {
-          if (node.children && node.children.last) {
-            if (node.children.last.type === "String") {
-              if (node.children.last.value.indexOf(".wxss") > 0)
-                node.children.last.value = node.children.last.value.replace(".wxss", ".acss");
+          if (node.children) {
+            for (c of node.children) {
+              if (c.type === "String") {
+                if (c.value.indexOf(".wxss") > 0)
+                  c.value = c.value.replace(".wxss", ".acss");
+                break; // 只替换第一个字符串，如果有多个字符串，就不替换了。
+              }
               // console.log(node.children.last.value);
             }
           }
         }
         if (node.type == "Raw" && node.value.match(/^\s*\/\//)) {
           let i = node.value.indexOf("\n");
-          node.value = i > -1 ? node.value.substr(i) : ' ';
+          node.value = i > -1 ? node.value.substr(i) : " ";
         }
         if (node.type === "TypeSelector") {
           if (node.name in types) {
