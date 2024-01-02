@@ -1,45 +1,43 @@
 const { relative, join, dirname } = require("path");
+
 module.exports.resolveRelationDir = function (to, state) {
   let relativePath = join(relative(dirname(to), state.opts.ctx.config.targetDir));
-
-  // let pluginP = join(state.opts.ctx.config.targetDir, "plugin");
-  // let miniprogramP = join(state.opts.ctx.config.targetDir, "miniprogram");
-  // let relativePath = null;
-  // if (to.indexOf(pluginP) > -1) {
-  //   relativePath = join(relative(dirname(to), pluginP));
-  // } else {
-  //   relativePath = join(relative(dirname(to), miniprogramP));
-  // }
   return relativePath;
+};
+
+/**
+ * 获取npm包的绝对路径
+ * @param {*} config 配置
+ * @param {*} packageName 包名
+ * @returns
+ */
+module.exports.resolveNpmPath = function (config, packageName) {
+  let npmPackagePath = join(config.fromDir, config.miniprogramRoot, "miniprogram_npm", packageName);
+  return npmPackagePath;
 };
 
 module.exports.resolveMiniProgramRelationDir = function (to, state) {
-  let relativePath = join(relative(dirname(to), join(state.opts.ctx.config.targetDir, "miniprogram_npm")));
-
-  // let pluginP = join(state.opts.ctx.config.targetDir, "plugin");
-  // let miniprogramP = join(state.opts.ctx.config.targetDir, "miniprogram");
-  // let relativePath = null;
-  // if (to.indexOf(pluginP) > -1) {
-  //   relativePath = join(relative(dirname(to), pluginP));
-  // } else {
-  //   relativePath = join(relative(dirname(to), miniprogramP));
-  // }
+  let relativePath = join(
+    relative(dirname(to), join(state.opts.ctx.config.targetDir, config.miniprogramRoot, "miniprogram_npm"))
+  );
   return relativePath;
 };
 
-module.exports.resolveMiniProgramRelationTargetDir = function (to, targetDir) {
-  let relativePath = join(relative(dirname(to), join(targetDir, "miniprogram_npm")));
+module.exports.resolveMiniProgramRelationTargetDir = function (to, config) {
+  let relativePath = join(relative(dirname(to), join(config.targetDir, config.miniprogramRoot, "miniprogram_npm")));
 
   return relativePath;
 };
 
-module.exports.resolveRelationTargetDir = function (to, targetDir) {
-  let relativePath = join(relative(dirname(to), targetDir));
+module.exports.resolveRelationTargetDir = function (to, config, dir) {
+  let relativePath = join(relative(dirname(to), join(config.targetDir, config.miniprogramRoot, dir)));
 
   return relativePath;
 };
 module.exports.resolveNpmLibRelationDir = function (to, state) {
-  let relativePath = join(relative(dirname(to), join(state.opts.ctx.config.targetDir, "npm_lib")));
+  let relativePath = join(
+    relative(dirname(to), join(state.opts.ctx.config.targetDir, config.miniprogramRoot, "npm_lib"))
+  );
   return relativePath;
 };
 

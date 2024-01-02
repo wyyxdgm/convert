@@ -1,5 +1,7 @@
-const { resolveMiniProgramRelationTargetDir, resolveRelationTargetDir } = require("./config");
-
+const { existsSync, fstatSync } = require("fs-extra");
+const { resolveMiniProgramRelationTargetDir, resolveRelationTargetDir, resolveNpmPath } = require("./config");
+const path = require("path");
+const fs = require("fs");
 // wx27602f810c4ff00d
 module.exports = [
   {
@@ -41,17 +43,21 @@ module.exports = [
           /**
            * 相对路径修复
            */
-          if (!vv.startsWith("./") && !vv.startsWith("/") && !~vv.indexOf(":")) {
+          if (!vv.startsWith(".") && !vv.startsWith("/") && !~vv.indexOf(":")) {
             let topLevelFolderName = vv.split("/")[0];
             // 如果是npm包
             if (ctx.config.dependencies[topLevelFolderName]) {
               obj.usingComponents[originalComponentName] =
-                resolveMiniProgramRelationTargetDir(c.to, ctx.config.targetDir) + "/" + vv;
+                resolveMiniProgramRelationTargetDir(c.to, ctx.config) + "/" + vv;
+              // 文件夹
+              let p = resolveNpmPath(ctx.config, vv);
+              if (existsSync(p) && fs.statSync(p).isDirectory()) obj.usingComponents[originalComponentName] += "/index";
               if (ctx.config.verbose)
                 console.log(`[json]替换miniprogram_npm依赖`, `${vv} -> ${obj.usingComponents[originalComponentName]}`);
-            } else if (topLevelFolderName === "weui-miniprogram") { // 针对本项目制定修复路径
+            } else if (topLevelFolderName === "weui-miniprogram") {
+              // 针对本项目制定修复路径
               obj.usingComponents[originalComponentName] =
-                resolveRelationTargetDir(c.to, ctx.config.targetDir + "/" + "packageExtend/components") +
+                resolveRelationTargetDir(c.to, ctx.config, "packageExtend/components") +
                 "/" +
                 vv.replace("weui-miniprogram/", "");
               if (ctx.config.verbose)
