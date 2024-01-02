@@ -1,6 +1,6 @@
 module.exports = {
   // match 可以是函数、正则、字符
-  match: "project.config.json",
+  match: (f) => f.endsWith("project.config.json"),
   parse(c, ctx) {
     // c.getStr 获取当前内容
     // c.setStr 设置内容
@@ -14,7 +14,7 @@ module.exports = {
     let newObj = {
       enableAppxNg: true,
       format: 2,
-      // miniprogramRoot: "miniprogram",
+      miniprogramRoot: obj.miniprogramRoot,
       pluginRoot: obj.pluginRoot,
       compileType: obj.compileType,
       compileOptions: {

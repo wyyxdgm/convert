@@ -57,9 +57,14 @@ module.exports = function ({ types: _t }) {
         const { node } = path;
         let { c, ctx } = state.opts;
         // console.log(`node.callee`, node.callee);
+        // if (
+        //   _t.isMemberExpression(node.callee) &&
+        //   _t.isIdentifier(node.callee.property, { name: "animate" })
+        // ) 
+        // console.log(`node.callee.object.name-------------`, node.callee?.object, c.from);
         if (
           _t.isMemberExpression(node.callee) &&
-          // _t.isIdentifier(node.callee.object, { name: "this" }) &&
+          _t.isIdentifier(node.callee.object, { name: "this" }) &&
           _t.isIdentifier(node.callee.property, { name: "animate" })
         ) {
           // --统计this.animate到unsupportDir--

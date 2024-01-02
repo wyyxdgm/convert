@@ -4,7 +4,7 @@ function replaceProp(obj, f, t) {
 }
 module.exports = {
   // match 可以是函数、正则、字符
-  match: "app.json",
+  match: (f) => f.endsWith("/app.json"),
   parse(c, ctx) {
     // 组织新的app.json结构
     obj = require(c.from);

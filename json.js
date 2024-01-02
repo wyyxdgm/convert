@@ -1,3 +1,5 @@
+const { resolveMiniProgramRelationTargetDir, resolveRelationTargetDir } = require("./config");
+
 // wx27602f810c4ff00d
 module.exports = [
   {
@@ -9,7 +11,7 @@ module.exports = [
       !f.endsWith("/project.project.json") &&
       !f.endsWith("/package-lock.json") &&
       !f.endsWith("/package.json"), // match 可以是函数、正则、字符
-    parse(c, ctx) {
+    parse(c, ctx, state) {
       let bb = c.getStr();
       let obj = {};
       try {
@@ -35,6 +37,28 @@ module.exports = [
           if (~vv.indexOf("custom-tab-bar")) {
             delete obj.usingComponents[originalComponentName];
             //  = vv.replace("custom-tab-bar", "customize-tab-bar");
+          }
+          /**
+           * 相对路径修复
+           */
+          if (!vv.startsWith("./") && !vv.startsWith("/") && !~vv.indexOf(":")) {
+            let idx = vv.indexOf("/");
+            let topLevelFolderName = vv.substring(0, idx);
+            // let suffixName = vv.substr(idx);
+            // 如果是npm包
+            if (ctx.config.dependencies[topLevelFolderName]) {
+              obj.usingComponents[originalComponentName] =
+                resolveMiniProgramRelationTargetDir(c.to, ctx.config.targetDir) + "/" + vv;
+              console.log(`[json]替换miniprogram_npm依赖`, obj.usingComponents[originalComponentName]);
+            } if (topLevelFolderName === "weui-miniprogram") {
+              obj.usingComponents[originalComponentName] =
+                resolveRelationTargetDir(c.to, ctx.config.targetDir + "/" + "packageExtend/components") +
+                "/" +
+                vv.replace("weui-miniprogram/", "");
+              console.log(`[json]替换weui-miniprogram依赖`, obj.usingComponents[originalComponentName]);
+            } else {
+              obj.usingComponents[originalComponentName] = "./" + vv;
+            }
           }
           /**
            * 收集大写组件

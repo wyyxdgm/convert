@@ -26,6 +26,18 @@ module.exports.resolveMiniProgramRelationDir = function (to, state) {
   // }
   return relativePath;
 };
+
+module.exports.resolveMiniProgramRelationTargetDir = function (to, targetDir) {
+  let relativePath = join(relative(dirname(to), join(targetDir, "miniprogram_npm")));
+
+  return relativePath;
+};
+
+module.exports.resolveRelationTargetDir = function (to, targetDir) {
+  let relativePath = join(relative(dirname(to), targetDir));
+
+  return relativePath;
+};
 module.exports.resolveNpmLibRelationDir = function (to, state) {
   let relativePath = join(relative(dirname(to), join(state.opts.ctx.config.targetDir, "npm_lib")));
   return relativePath;
