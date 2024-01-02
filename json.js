@@ -42,22 +42,25 @@ module.exports = [
            * 相对路径修复
            */
           if (!vv.startsWith("./") && !vv.startsWith("/") && !~vv.indexOf(":")) {
-            let idx = vv.indexOf("/");
-            let topLevelFolderName = vv.substring(0, idx);
-            // let suffixName = vv.substr(idx);
+            let topLevelFolderName = vv.split("/")[0];
             // 如果是npm包
             if (ctx.config.dependencies[topLevelFolderName]) {
               obj.usingComponents[originalComponentName] =
                 resolveMiniProgramRelationTargetDir(c.to, ctx.config.targetDir) + "/" + vv;
-              console.log(`[json]替换miniprogram_npm依赖`, obj.usingComponents[originalComponentName]);
-            } if (topLevelFolderName === "weui-miniprogram") {
+              if (ctx.config.verbose)
+                console.log(`[json]替换miniprogram_npm依赖`, `${vv} -> ${obj.usingComponents[originalComponentName]}`);
+            }
+            if (topLevelFolderName === "weui-miniprogram") {
               obj.usingComponents[originalComponentName] =
                 resolveRelationTargetDir(c.to, ctx.config.targetDir + "/" + "packageExtend/components") +
                 "/" +
                 vv.replace("weui-miniprogram/", "");
-              console.log(`[json]替换weui-miniprogram依赖`, obj.usingComponents[originalComponentName]);
+              if (ctx.config.verbose)
+                console.log(`[json]替换weui-miniprogram依赖`, `${vv} -> ${obj.usingComponents[originalComponentName]}`);
             } else {
               obj.usingComponents[originalComponentName] = "./" + vv;
+              if (ctx.config.verbose)
+                console.log(`[json]替换相对路径依赖`, `${vv} -> ${obj.usingComponents[originalComponentName]}`);
             }
           }
           /**
