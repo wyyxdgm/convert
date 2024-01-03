@@ -118,8 +118,7 @@ module.exports = [
         }
         if (node.tagName == "input") {
           // 支付宝小程序input不支持Tap事件
-          if (node.attributes["bindfocus"]) delete node.attributes["bindfocus"];
-          let onFocus = node.attributes["bindtap"] || node.attributes["bind:tap"];
+          let onFocus = node.attributes["bindtap"] || node.attributes["bind:tap"] || node.attributes["bindfocus"];
           if (onFocus) node.attributes.onFocus = onFocus;
           delete node.attributes["bindtap"];
         }

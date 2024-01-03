@@ -21,14 +21,14 @@ module.exports = [
       csstree.walk(c.ast, function (node) {
         if (node.type === "AtrulePrelude") {
           if (node.children) {
-            for (c of node.children) {
+            node.children.cur = node.children.head;
+            do {
+              let c = node.children.cur.data;
               if (c.type === "String") {
-                if (c.value.indexOf(".wxss") > 0)
-                  c.value = c.value.replace(".wxss", ".acss");
+                if (~c.value.indexOf(".wxss")) c.value = c.value.replace(".wxss", ".acss");
                 break; // 只替换第一个字符串，如果有多个字符串，就不替换了。
               }
-              // console.log(node.children.last.value);
-            }
+            } while ((node.children.cur = node.children.cur.next));
           }
         }
         if (node.type == "Raw" && node.value.match(/^\s*\/\//)) {
