@@ -1,5 +1,5 @@
 const xmlAttr = require("./config/wxml-attr");
-const { appendClass, appendAttr, getStore } = require("./config");
+const { appendClass, appendAttr, getStore, replaceChildArray, appendChildArray } = require("./config");
 const fs = require("fs");
 const path = require("path");
 /**
@@ -129,6 +129,34 @@ module.exports = [
           // 模糊匹配
           for (attrKey in node.attributes) {
             filterAttr(attrKey, node);
+          }
+        }
+        /**
+         * icon
+         * icon 遇到onTap创建并挪到父节点view
+         * icon size="?rpx"，换成?/2
+         */
+        if (node.tagName === "icon") {
+          // 查找并处理 "onTap" 属性
+          if (node.attributes["onTap"]) {
+            // 创建一个新的 "view" 节点，将 "icon" 节点移动到此新节点下
+            let viewNode = wxml.parse("<view></view>")[0];
+            replaceChildArray(parent, node, viewNode); // childNodes
+            viewNode.attributes.onTap = node.attributes["onTap"];
+            delete node.attributes["onTap"];
+            if (node.attributes["a:if"]) {
+              viewNode.attributes["a:if"] = node.attributes["a:if"];
+              delete node.attributes["a:if"];
+            }
+            appendChildArray(viewNode, node);
+          }
+
+          //  查找并处理 "size" 属性
+          let size = node.attributes["size"];
+          if (size && size.endsWith("rpx")) {
+            // 将 "size" 的值除以 2
+            let newSizeValue = parseInt(size) / 2;
+            node.attributes["size"] = `${newSizeValue}`;
           }
         }
       });
