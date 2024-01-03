@@ -1,4 +1,4 @@
-const { resolveRelationDir } = require('../config');
+const { resolveRelationDir } = require('../util');
 module.exports = function ({ types: _t }) {
   return {
     visitor: {

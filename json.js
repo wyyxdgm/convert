@@ -1,5 +1,5 @@
 const { existsSync, fstatSync } = require("fs-extra");
-const { resolveMiniProgramRelationTargetDir, resolveRelationTargetDir, resolveNpmPath } = require("./config");
+const { resolveMiniProgramRelationTargetDir, resolveRelationTargetDir, resolveNpmPath } = require("./util");
 const path = require("path");
 const fs = require("fs");
 // wx27602f810c4ff00d

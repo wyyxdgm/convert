@@ -1,5 +1,5 @@
-const xmlAttr = require("./config/wxml-attr");
-const { appendClass, appendAttr, getStore, replaceChildArray, appendChildArray } = require("./config");
+const xmlAttr = require("./util/wxml-attr");
+const { appendClass, appendAttr, getStore, replaceChildArray, appendChildArray } = require("./util");
 const fs = require("fs");
 const path = require("path");
 /**

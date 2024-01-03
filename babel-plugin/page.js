@@ -5,7 +5,7 @@ const {
   getAnimationKeyFromSelector,
   getStore,
   resolveMiniProgramRelationDir,
-} = require("../config");
+} = require("../util");
 // --统计this.animate到unsupportDir--
 // const fs = require("fs");
 // const path = require("path");
