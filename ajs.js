@@ -17,21 +17,22 @@ module.exports = [
         presets: [
           [
             "@babel/preset-env",
-            {
-              modules: false,
-              targets: {
-                chrome: "60"
-              }
-            }
+            // {
+            //   modules: false,
+            //   targets: {
+            //     chrome: "60"
+            //   }
+            // }
           ],
-          ["@babel/preset-typescript", { onlyRemoveTypeImports: true }]
+          ["@babel/preset-typescript", { onlyRemoveTypeImports: true }],
         ],
         plugins: [
+          "@babel/plugin-transform-block-scoping",
           // "@babel/plugin-transform-reserved-words",
           // "@babel/plugin-proposal-optional-chaining",
           [path.join(__dirname, "./babel-plugin/babel-replace-wx.js"), { c, ctx }],
           [path.join(__dirname, "./babel-plugin/babel-enhances.js"), { c, ctx, enhances }],
-          [path.join(__dirname, "./babel-plugin/page.js"), { c, ctx, enhances }]
+          [path.join(__dirname, "./babel-plugin/page.js"), { c, ctx, enhances }],
           // ...(parseOption?.plugins?.[f] || []),
           // [
           //   "./build/convert/babel-plugin/babel-plugin-relation.ts",
@@ -45,7 +46,7 @@ module.exports = [
           // ],
           // ["./build/convert/babel-plugin/babel-plugin-app-variable.ts", {}],
           // ["./build/convert/babel-plugin/babel-plugin-methods.ts", {}]
-        ]
+        ],
       });
       c.serialize = () => c.transform.code.replace(/微信/g, '支付宝');
     }

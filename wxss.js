@@ -33,7 +33,7 @@ module.exports = [
         }
         if (node.type == "Raw" && node.value.match(/^\s*\/\//)) {
           let i = node.value.indexOf("\n");
-          node.value = i > -1 ? node.value.substr(i) : " ";
+          node.value = i > -1 ? "\n" + node.value.substr(i) : " ";
         }
         if (node.type === "TypeSelector") {
           if (node.name in types) {
@@ -49,7 +49,11 @@ module.exports = [
           }
         }
       });
-      c.serialize = () => csstree.generate(c.ast).replace(/\}/g, "}\n");
+      c.serialize = () =>
+        csstree
+          .generate(c.ast)
+          .replace(/(\.acss";?)/g, "$1;\n")
+          .replace(/\}/g, "}\n");
     },
   },
 ];
