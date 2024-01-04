@@ -48,20 +48,12 @@ module.exports = [
             // 如果是npm包
             if (ctx.config.dependencies[topLevelFolderName]) {
               obj.usingComponents[originalComponentName] =
-                resolveMiniProgramRelationTargetDir(c.to, ctx.config) + "/" + vv;
+                resolveMiniProgramRelationTargetDir(c.to, ctx.config) + "/" + vv; // 需要官方工具执行"npm构建"
               // 文件夹
               let p = resolveNpmPath(ctx.config, vv);
               if (existsSync(p) && fs.statSync(p).isDirectory()) obj.usingComponents[originalComponentName] += "/index";
               if (ctx.config.verbose)
                 console.log(`[json]替换miniprogram_npm依赖`, `${vv} -> ${obj.usingComponents[originalComponentName]}`);
-            } else if (topLevelFolderName === "weui-miniprogram") {
-              // 针对本项目制定修复路径
-              obj.usingComponents[originalComponentName] =
-                resolveRelationTargetDir(c.to, ctx.config, "packageExtend/components") +
-                "/" +
-                vv.replace("weui-miniprogram/", "");
-              if (ctx.config.verbose)
-                console.log(`[json]替换weui-miniprogram依赖`, `${vv} -> ${obj.usingComponents[originalComponentName]}`);
             } else {
               obj.usingComponents[originalComponentName] = "./" + vv;
               if (ctx.config.verbose)
