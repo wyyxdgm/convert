@@ -24,7 +24,7 @@ module.exports.resolveMiniProgramRelationDir = function (to, state) {
 };
 
 module.exports.resolveMiniProgramRelationTargetDir = function (to, config) {
-  let relativePath = join(relative(dirname(to), this.config.targetMiniprogramNpmPath));
+  let relativePath = join(relative(dirname(to), config.targetMiniprogramNpmPath));
 
   return relativePath;
 };
