@@ -17,12 +17,12 @@ module.exports = [
         presets: [
           [
             "@babel/preset-env",
-            // {
-            //   modules: false,
-            //   targets: {
-            //     chrome: "60"
-            //   }
-            // }
+            {
+              modules: false,
+              targets: {
+                chrome: "60"
+              }
+            }
           ],
           ["@babel/preset-typescript", { onlyRemoveTypeImports: true }],
         ],
