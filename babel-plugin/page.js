@@ -117,7 +117,7 @@ module.exports = function ({ types: _t }) {
             if (!state.hasMyDone) {
               let { to } = state.opts.c;
               let { template } = state.opts.ctx.$.core;
-              let relativePath = resolveRelationDir(to, state);
+              let relativePath = resolveRelationDir(to, state.opts.ctx.config);
               relativePath += "/$my";
               const buildRequire = template(`import %%importName%% from %%source%%;`);
               const ast = buildRequire({

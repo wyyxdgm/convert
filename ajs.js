@@ -20,9 +20,9 @@ module.exports = [
             {
               modules: false,
               targets: {
-                chrome: "60"
-              }
-            }
+                chrome: "60",
+              },
+            },
           ],
           ["@babel/preset-typescript", { onlyRemoveTypeImports: true }],
         ],

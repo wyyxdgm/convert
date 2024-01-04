@@ -65,6 +65,20 @@ function getNoIncludeWxml(rootDir, wxmlCode, wxmlPath) {
 // <include src="../components/scan/basic/scan-basic.wxml"/>
 // ```;
 
+/**
+ * 小程序demo的 common/foot.wxml 、common/head.wxml看起来不对
+ * @param {*} param0 
+ */
+function filter({ node, parent, parsed, wxml, c, ctx }) {
+  if (node.tagName === "import") {
+    if (node.attributes.src.indexOf("common/foot.wxml")) {
+      node.attributes.src = "/common/foot.wxml";
+    }
+    if (node.attributes.src.indexOf("common/head.wxml")) {
+      node.attributes.src = "/common/head.wxml";
+    }
+  }
+}
 module.exports = [
   {
     match: /\.wxml$/, // match 可以是函数、正则、字符
@@ -78,6 +92,7 @@ module.exports = [
       const parsed = wxml.parse(c.getStr());
       // 解析依赖关系
       wxml.traverse(parsed, function visitor(node, parent) {
+        filter({ node, parent, parsed, wxml, c, ctx });
         if (node.tagName == "wxs") {
           //标签名更改
           node.tagName = "import-sjs";

@@ -1,7 +1,7 @@
 const { relative, join, dirname } = require("path");
 
-module.exports.resolveRelationDir = function (to, state) {
-  let relativePath = join(relative(dirname(to), state.opts.ctx.config.targetDir));
+module.exports.resolveRelationDir = function (to, config) {
+  let relativePath = join(relative(dirname(to), join(config.targetDir, config.miniprogramRoot)));
   return relativePath;
 };
 

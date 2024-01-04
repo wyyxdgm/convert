@@ -21,7 +21,7 @@ module.exports = function ({ types: t }) {
           if (!enhanceKeys) return;
           let { to } = state.opts.c;
           let { template } = state.opts.ctx.$.core;
-          let relativePath = resolveRelationDir(to, state);
+          let relativePath = resolveRelationDir(to, state.opts.ctx.config);
           relativePath += "/enhance";
           if (enhanceKeys.find((k) => path.scope.hasBinding(k))) return;
           let sps = enhanceKeys.map((k) => t.importSpecifier(t.identifier(k), t.identifier(k)));
