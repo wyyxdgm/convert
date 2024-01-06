@@ -67,14 +67,14 @@ function getNoIncludeWxml(rootDir, wxmlCode, wxmlPath) {
 
 /**
  * 小程序demo的 common/foot.wxml 、common/head.wxml看起来不对
- * @param {*} param0 
+ * @param {*} param0
  */
 function filter({ node, parent, parsed, wxml, c, ctx }) {
   if (node.tagName === "import") {
-    if (node.attributes.src.indexOf("common/foot.wxml")) {
+    if (~node.attributes.src.indexOf("common/foot.wxml")) {
       node.attributes.src = "/common/foot.wxml";
     }
-    if (node.attributes.src.indexOf("common/head.wxml")) {
+    if (~node.attributes.src.indexOf("common/head.wxml")) {
       node.attributes.src = "/common/head.wxml";
     }
   }
@@ -105,8 +105,11 @@ module.exports = [
               node.childNodes = [];
               node.attributes.from = `./${c._to.name}.sjs`; // 约定：一个axml只能引入一个wxs，会生成到同路径下，替换后缀
               node.selfClosing = true;
-              code = code.replace(/module\.exports\s?\=/g, "export default");
-              ctx.setStr(c.to.replace(".axml", ".sjs"), code);
+              ctx.setStr(
+                c.to.replace(".axml", ".sjs"),
+                code,
+                c.from.replace(".wxml", ".wxs").replace(`${c._to.name}.wxs`, `.${c._to.name}.wxs`)
+              );
             }
           }
         }
@@ -177,7 +180,7 @@ module.exports = [
       });
       c.parsed = parsed;
       c.serialize = () => wxml.serialize(c.parsed).replace(/微信/g, "支付宝");
-    }
+    },
   },
   {
     name: "适配标签样式/替换tag",
@@ -226,8 +229,8 @@ module.exports = [
           }
         });
       }
-    }
-  }
+    },
+  },
 ];
 
 /**

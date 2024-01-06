@@ -1,3 +1,4 @@
+const { existsSync } = require("fs-extra");
 const { relative, join, dirname } = require("path");
 
 module.exports.resolveRelationDir = function (to, config) {
@@ -16,10 +17,22 @@ module.exports.resolveNpmPath = function (config, packageName) {
   return npmPackagePath;
 };
 
-module.exports.resolveMiniProgramRelationDir = function (to, state) {
-  let relativePath = join(
-    relative(dirname(to), join(state.opts.ctx.config.targetDir, config.miniprogramRoot, "miniprogram_npm"))
-  );
+let cachePath = new Map();
+/**
+ * 获取npm包文件是否存在
+ * @param {*} config 配置
+ * @param {*} packageName 包名
+ * @returns boolean 是否存在
+ */
+module.exports.existsNpmPath = function (config, packageName) {
+  let npmPackagePath = module.exports.resolveNpmPath(config, packageName);
+  if (cachePath.has(npmPackagePath)) return cachePath.get(npmPackagePath);
+  cachePath.set(npmPackagePath, existsSync(npmPackagePath));
+  return cachePath.get(npmPackagePath);
+};
+
+module.exports.resolveMiniProgramRelationDir = function (to, config) {
+  let relativePath = join(relative(dirname(to), join(config.targetDir, config.miniprogramRoot, "miniprogram_npm")));
   return relativePath;
 };
 

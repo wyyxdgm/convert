@@ -19,10 +19,9 @@ module.exports = [{
         ],
         plugins: [[path.join(__dirname, "./babel-plugin/babel-wxs.js")]],
       });
-      // .replace("module.exports =", "export default")
       c.serialize = () =>
         c.transform.code
-          .replace("module.exports =", "export default")
-          .replace(/module\.exports\.([^\s=]+)/, "export const $1");
+          .replace(/module\.exports\s?\=/g, "export default")
+          .replace(/module\.exports\.([^\s=]+)/g, "export const $1");
     }
 }];
