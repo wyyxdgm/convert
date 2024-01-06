@@ -21,6 +21,7 @@ module.exports = {
         component2: true,
         typescript: true,
         less: true,
+        globalObjectMode: "enable",
       },
       uploadExclude: obj.packOptions.ignore.map((item) => {
         return item.value;
