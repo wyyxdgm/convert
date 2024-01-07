@@ -8,13 +8,25 @@
 - [x] 微信插件转支付宝插件
 - [x] 微信小程序转支付宝小程序（本模板）
 
-## 命令行
+## 使用
+
+### 安装依赖
+
+```bash
+npm install
+```
+
+### 安装 cli
 
 ```bash
 npm i -g wx-convert
+# 局部安装
+npm i wx-convert
 ```
 
-配置好 convert.config.js 文件，参考[convert.config.js](../convert.config.js)
+### 配置入口文件
+
+配置好 convert.config.js 文件，参考[convert.config.js](https://github.com/wyyxdgm/convert-miniprogram-to-aliminiprogram-template/blob/master/convert.config.js)
 
 ```bash
 wx-convert aplugin
@@ -25,6 +37,7 @@ wx-convert aplugin -v # 详细日志
 ## 参考文档
 
 [wx-convert 使用文档](https://github.com/wyyxdgm/wx-convert#readme)
+[convert-miniprogram 使用文档](https://github.com/wyyxdgm/convert-miniprogram-to-aliminiprogram-template#readme)
 
 ## 兼容性说明
 
