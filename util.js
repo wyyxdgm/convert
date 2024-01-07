@@ -2,7 +2,14 @@ const { existsSync } = require("fs-extra");
 const { relative, join, dirname } = require("path");
 
 module.exports.resolveRelationDir = function (to, config) {
-  let relativePath = join(relative(dirname(to), join(config.targetDir, config.miniprogramRoot)));
+  let pluginP = join(config.targetDir, config.pluginRoot);
+  let miniprogramP = join(config.targetDir, config.miniprogramRoot);
+  let relativePath = null;
+  if (pluginP && to.indexOf(pluginP) > -1) {
+    relativePath = join(relative(dirname(to), pluginP));
+  } else {
+    relativePath = join(relative(dirname(to), miniprogramP));
+  }
   return relativePath;
 };
 
