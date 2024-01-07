@@ -90,17 +90,18 @@ function getAnimationKeyFromSelector(selector) {
 function Adapter(type, c, typeStr, k, k2, k3) {
   let o_ = c[k];
   c[k] = function () {
-    console.log(
-      `[${this.route || this.is}] before ${typeStr} ${k}`,
-      "data--",
-      this.data,
-      "props--",
-      this.props,
-      "mixins--",
-      c.mixins,
-      "opt",
-      c
-    );
+    if ($my.debug > 3)
+      console.log(
+        `[${this.route || this.is}] before ${typeStr} ${k}`,
+        "data--",
+        this.data,
+        "props--",
+        this.props,
+        "mixins--",
+        c.mixins,
+        "opt",
+        c
+      );
 
     // triggerEvent
     this.triggerEvent = function (key, data) {
@@ -120,7 +121,7 @@ function Adapter(type, c, typeStr, k, k2, k3) {
         },
         () => {
           callback && callback.apply(this);
-          console.log(`this.clearAnimation:手动回调成功`);
+          if ($my.debug > 5) console.log(`this.clearAnimation:手动回调成功`);
         }
       );
 
@@ -173,7 +174,7 @@ function Adapter(type, c, typeStr, k, k2, k3) {
       }, duration);
       setTimeout(() => {
         callback && callback.apply(this);
-        console.log(`this.animate:过${duration}ms,手动回调成功`);
+        if ($my.debug > 5) console.log(`this.animate:过${duration}ms,手动回调成功`);
       }, duration);
       // this.props[triggerKeyToMethodName(key)] && this.props[triggerKeyToMethodName(key)]({ detail: data });
     };
@@ -198,7 +199,7 @@ function Adapter(type, c, typeStr, k, k2, k3) {
             lifetimeFn && lifetimeFn.apply(this, arguments);
             pageLifeFunc && pageLifeFunc.apply(this, arguments);
           };
-          console.log(`映射Page lifetimes ${lifetime} -> ${pageLifeKey}`);
+          if ($my.debug > 5) console.log(`映射Page lifetimes ${lifetime} -> ${pageLifeKey}`);
         }
       }
     }
@@ -296,7 +297,7 @@ function Adapter(type, c, typeStr, k, k2, k3) {
             let onLoad = bh.c.methods.onLoad;
             c.methods.onLoad = async function () {
               if (this.$_attached) await this.$_attached;
-              console.log(`[${this.route || this.is}] methods.onLoad`, this.data);
+              if ($my.debug > 3) console.log(`[${this.route || this.is}] methods.onLoad`, this.data);
               this.$_attached2 = (async () => {
                 _onLoad && (await _onLoad.apply(this, arguments));
                 onLoad && (await onLoad.apply(this, arguments));
@@ -305,7 +306,7 @@ function Adapter(type, c, typeStr, k, k2, k3) {
 
             let _onReady = c.methods.onReady;
             c.methods.onReady = async function () {
-              console.log(`[${this.route || this.is}] methods.onReady`, this.data);
+              if ($my.debug > 3) console.log(`[${this.route || this.is}] methods.onReady`, this.data);
               if (this.$_attached2) await this.$_attached2;
               else if (this.$_attached) await this.$_attached;
               _onReady && _onReady.apply(this, arguments);
@@ -313,14 +314,14 @@ function Adapter(type, c, typeStr, k, k2, k3) {
           }
           let _onShow = c.onShow;
           c.onShow = async function () {
-            console.log(`[${this.route || this.is}] onShow`, this.data);
+            if ($my.debug > 3) console.log(`[${this.route || this.is}] onShow`, this.data);
             if (this.$_attached2) await this.$_attached2;
             else if (this.$_attached) await this.$_attached;
             _onShow && _onShow.apply(this, arguments);
           };
           let _onReady = c.onReady;
           c.onReady = async function () {
-            console.log(`[${this.route || this.is}] onReady`, this.data);
+            if ($my.debug > 3) console.log(`[${this.route || this.is}] onReady`, this.data);
             if (this.$_attached2) await this.$_attached2;
             else if (this.$_attached) await this.$_attached;
             _onReady && _onReady.apply(this, arguments);
@@ -329,7 +330,7 @@ function Adapter(type, c, typeStr, k, k2, k3) {
       }
       let _attached = c.lifetimes.attached;
       c.lifetimes.attached = async function (options = {}, level = 1, k = "") {
-        console.log(`[${this.route || this.is}] lifetimes.attached`, k);
+        if ($my.debug > 3) console.log(`[${this.route || this.is}] lifetimes.attached`, k);
         this.$_attached = (async () => {
           if (attacheds.length)
             await Promise.all(
@@ -426,7 +427,7 @@ function Adapter(type, c, typeStr, k, k2, k3) {
   // 卸载、回收
   const o2_ = c[k2];
   c[k2] = function () {
-    console.log(`[${this.route || this.is}] ${typeStr} ${k2}`);
+    if ($my.debug > 3) console.log(`[${this.route || this.is}] ${typeStr} ${k2}`);
     // call original function
     o2_ && o2_.apply(this, arguments);
     // console.log(`[${this.route || this.is}] after ${typeStr} ${k2}`);

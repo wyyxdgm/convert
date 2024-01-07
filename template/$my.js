@@ -14,12 +14,13 @@ class CustomMy extends My {
     super();
     this.eventManager = new BaseEvent();
   }
+  debug = 0;
   isMy = true;
   startDeviceMotionListening(opt) {
-    console.warn("no support startDeviceMotionListening", opt);
+    if (this.debug > 1) console.warn("no support startDeviceMotionListening", opt);
   }
   stopDeviceMotionListening(opt) {
-    console.warn("no support stopDeviceMotionListening", opt);
+    if (this.debug > 1) console.warn("no support stopDeviceMotionListening", opt);
   }
 
   getMenuButtonBoundingClientRect() {
@@ -54,7 +55,7 @@ class CustomMy extends My {
     if (!this.locationeInterval) {
       this.locationeInterval = setInterval(() => {
         my.getLocation({
-          success: (res) => this.eventManager.fire("locationChange", res),
+          success: (res) => this.eventManager.fire("locationChange", this, res),
           fail: (e) => console.warn("getLocation Error", e),
         });
       }, 1000);
@@ -134,8 +135,9 @@ class CustomMy extends My {
     if (this.getSystemInfoSync().platform == "devtools") return false;
     try {
       // 支付宝小程序特有 ARSession、ExpAREngine
-      console.log("ARSession", ARSession);
-      console.log("ARSession.isSupported", ARSession && ARSession.isSupported({ mode: "worldTracking" }));
+      if (this.debug > 3) console.log("ARSession", ARSession);
+      if (this.debug > 1)
+        console.log("ARSession.isSupported", ARSession && ARSession.isSupported({ mode: "worldTracking" }));
       return ARSession && ARSession.isSupported({ mode: "worldTracking" });
     } catch (e) {
       console.error((e && e.toString && e.toString()) || JSON.stringify(e));
@@ -149,16 +151,16 @@ class CustomMy extends My {
     // AR/IOS/ARIos.ts、AR/Android/ARAndroid.ts
   }
   setInnerAudioOption() {
-    console.warn("不支持 setInnerAudioOption");
+    if (this.debug > 1) console.warn("不支持 setInnerAudioOption");
   }
   reportPerformance() {
-    console.warn("不支持 reportPerformance");
+    if (this.debug > 1) console.warn("不支持 reportPerformance");
   }
   reportEvent() {
-    console.warn("不支持 reportEvent");
+    if (this.debug > 1) console.warn("不支持 reportEvent");
   }
   setStorage(obj) {
-    if (obj.encrypt) console.warn("不支持");
+    if (obj.encrypt) if (this.debug > 1) console.warn("不支持");
     return super.setStorage(obj);
   }
   // 设置本地存储数据（同步）
@@ -167,7 +169,7 @@ class CustomMy extends My {
   }
   // 获取本地存储数据（异步）
   getStorage(params) {
-    if (params.encrypt) console.warn("不支持");
+    if (params.encrypt) if (this.debug > 1) console.warn("不支持");
     super.getStorage({
       key: params.key,
       success(res) {

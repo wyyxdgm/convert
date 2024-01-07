@@ -40,11 +40,11 @@ function getNoIncludeWxml(rootDir, wxmlCode, wxmlPath) {
           const src = match.match(/src=['"]([^'"]+)['"]/)[1];
           let filePath = src;
           if (src.startsWith("./") || src.startsWith("../")) {
-            filePath = path.resolve(path.dirname(includePath), src);
+            filePath = path.join(path.dirname(includePath), src);
           } else {
             filePath = path.join(rootDir, src);
           }
-          let str = match.replace(src, path.relative(path.dirname(wxmlPath), filePath));
+          let str = match.replace(src, path.relative(path.dirname(wxmlPath), filePath).replace(/\\/g, '/'));
           return str;
         });
       }

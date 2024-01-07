@@ -2,17 +2,16 @@ const { existsSync, fstatSync } = require("fs-extra");
 const { resolveMiniProgramRelationTargetDir, resolveRelationTargetDir, resolveNpmPath } = require("./util");
 const path = require("path");
 const fs = require("fs");
-// wx27602f810c4ff00d
 module.exports = [
   {
     match: (f, t, ctx) =>
       f.match(/\.json$/) &&
-      !f.endsWith("/app.json") &&
-      !f.endsWith("/sitemap.json") &&
-      !f.endsWith("/project.private.config.json") &&
-      !f.endsWith("/project.project.json") &&
-      !f.endsWith("/package-lock.json") &&
-      !f.endsWith("/package.json"), // match 可以是函数、正则、字符
+      !f.endsWith(`${path.sep}app.json`) &&
+      !f.endsWith(`${path.sep}sitemap.json`) &&
+      !f.endsWith(`${path.sep}project.private.config.json`) &&
+      !f.endsWith(`${path.sep}project.project.json`) &&
+      !f.endsWith(`${path.sep}package-lock.json`) &&
+      !f.endsWith(`${path.sep}package.json`), // match 可以是函数、正则、字符
     parse(c, ctx, state) {
       let bb = c.getStr();
       let obj = {};
@@ -20,7 +19,7 @@ module.exports = [
         obj = JSON.parse(bb);
       } catch (error) {
         console.log(`非法json`, c.from);
-        console.log(error);
+        // console.log(error);
         return;
       }
       // 禁用默认共享，使用apply-shared方案。https://opendocs.alipay.com/mini/framework/component-template?pathHash=5dcb7a97#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BB%84%E4%BB%B6%E6%A0%B7%E5%BC%8F%E9%9A%94%E7%A6%BB
