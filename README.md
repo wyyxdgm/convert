@@ -26,7 +26,7 @@ npm i wx-convert
 
 ### 配置入口文件
 
-配置好 convert.config.js 文件，参考[convert.config.js](https://github.com/wyyxdgm/convert-miniprogram-to-aliminiprogram-template/blob/master/convert.config.js)
+配置好 convert.config.js 文件，参考[convert.config.js](https://github.com/wyyxdgm/convert-miniprogram/blob/master/convert.config.js)
 
 ```bash
 wx-convert aplugin
@@ -37,7 +37,7 @@ wx-convert aplugin -v # 详细日志
 ## 参考文档
 
 [wx-convert 使用文档](https://github.com/wyyxdgm/wx-convert#readme)
-[convert-miniprogram 使用文档](https://github.com/wyyxdgm/convert-miniprogram-to-aliminiprogram-template#readme)
+[convert-miniprogram 使用文档](https://github.com/wyyxdgm/convert-miniprogram#readme)
 
 ## 兼容性说明
 
