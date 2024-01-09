@@ -1,5 +1,5 @@
 const xmlAttr = require("./config/wxml-attr");
-const { appendClass, appendAttr, getStore, replaceChildArray, appendChildArray } = require("./util");
+const { appendClass, appendAttr, getStore, replaceChildArray, appendChildArray } = require("./config");
 const fs = require("fs");
 const path = require("path");
 /**
@@ -65,20 +65,6 @@ function getNoIncludeWxml(rootDir, wxmlCode, wxmlPath) {
 // <include src="../components/scan/basic/scan-basic.wxml"/>
 // ```;
 
-/**
- * 小程序demo的 common/foot.wxml 、common/head.wxml看起来不对
- * @param {*} param0
- */
-function filter({ node, parent, parsed, wxml, c, ctx }) {
-  if (node.tagName === "import") {
-    if (~node.attributes.src.indexOf("common/foot.wxml")) {
-      node.attributes.src = "/common/foot.wxml";
-    }
-    if (~node.attributes.src.indexOf("common/head.wxml")) {
-      node.attributes.src = "/common/head.wxml";
-    }
-  }
-}
 module.exports = [
   {
     match: /\.wxml$/, // match 可以是函数、正则、字符
@@ -92,7 +78,6 @@ module.exports = [
       const parsed = wxml.parse(c.getStr());
       // 解析依赖关系
       wxml.traverse(parsed, function visitor(node, parent) {
-        filter({ node, parent, parsed, wxml, c, ctx });
         if (node.tagName == "wxs") {
           //标签名更改
           node.tagName = "import-sjs";
@@ -105,11 +90,8 @@ module.exports = [
               node.childNodes = [];
               node.attributes.from = `./${c._to.name}.sjs`; // 约定：一个axml只能引入一个wxs，会生成到同路径下，替换后缀
               node.selfClosing = true;
-              ctx.setStr(
-                c.to.replace(".axml", ".sjs"),
-                code,
-                c.from.replace(".wxml", ".wxs").replace(`${c._to.name}.wxs`, `.${c._to.name}.wxs`)
-              );
+              code = code.replace(/module\.exports\s?\=/g, "export default");
+              ctx.setStr(c.to.replace(".axml", ".sjs"), code);
             }
           }
         }
@@ -149,6 +131,7 @@ module.exports = [
             filterAttr(attrKey, node);
           }
         }
+
         /**
          * icon
          * icon 遇到onTap创建并挪到父节点view

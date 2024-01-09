@@ -1,5 +1,6 @@
 /*
-  微信wxml中的标签属性适配
+  todo:
+    todo、special
 */
 module.exports = [
   /*  微信   ->   支付宝  */
@@ -13,8 +14,8 @@ module.exports = [
   // 基础内容
   // icon 无差异
   // progress https://opendocs.alipay.com/mini/component/progress
-  ["activeColor", "active-color"],
-  ["backgroundColor", "background-color"],
+  ["activeColor","active-color"],
+  ["backgroundColor","background-color"],
   /*
     special : wx: active-mode[forwards default:backwards] a:active[true default:false]
     border-radius、font-size、color、duration、bindactiveend,active-
@@ -42,7 +43,7 @@ module.exports = [
     -,default-source
   */
   // 相机 https://opendocs.alipay.com/mini/03qegu#%E5%B1%9E%E6%80%A7%E8%AF%B4%E6%98%8E
-  ["resolution", "output-dimension", "1080P"], // 默认720P
+  ["resolution", "output-dimension", "1080P"],// 默认720P
   ["bindstop", "onStop"],
   ["binderror", "onError"],
   ["bindinitdone", "onReady"],
@@ -62,16 +63,16 @@ module.exports = [
   // 多项选择器组 checkbox-group
   ["bindchange", "onChange"],
   // 表单 form  https://opendocs.alipay.com/mini/component/form
-  ["bindsubmit", "onSubmit"],
-  ["bindreset", "onReset"],
+  ["bindsubmit","onSubmit"],
+  ["bindreset","onReset"],
   /*
     report-submit-timeout,-
   */
   // input  https://opendocs.alipay.com/mini/component/input
-  ["bindinput", "onInput"],
-  ["bindfocus", "onFocus"],
-  ["bindblur", "onBlur"],
-  ["bindconfirm", "onConfirm"],
+  ["bindinput","onInput"],
+  ["bindfocus","onFocus"],
+  ["bindblur","onBlur"],
+  ["bindconfirm","onConfirm"],
   /*
     bindkeyboardheightchange,-
     bindnicknamereview,-
@@ -93,7 +94,7 @@ module.exports = [
   // keyboard-accessory 无此标签
   // label 无差异
   // 底部弹出选择器picker special:微信倾向于封装，支付宝倾向于自定义
-  ["header-text", "title"],
+  ["header-text","title"],
   /*
     https://developers.weixin.qq.com/miniprogram/dev/component/picker.html
 
@@ -105,8 +106,8 @@ module.exports = [
     -,range、range-key、value
   */
   // picker-view
-  ["bindpickstart", "onPickStart"],
-  ["bindpickend", "onPickEnd"],
+  ["bindpickstart","onPickStart"],
+  ["bindpickend","onPickEnd"],
   /*
     immediate-change,-
   */
@@ -114,13 +115,13 @@ module.exports = [
   // slider todo
   // switch todo
   // textarea todo
-
+  
   // map
-  ["polygons", "polygon"],
-  ["bindmarkertap", "onMarkerTap"],
-  ["bindcallouttap", "onCalloutTap"],
-  ["bindcontroltap", "onControlTap"],
-  ["bindregionchange", "onRegionChange"],
+  ["polygons","polygon"],
+  ["bindmarkertap","onMarkerTap"],
+  ["bindcallouttap","onCalloutTap"],
+  ["bindcontroltap","onControlTap"],
+  ["bindregionchange","onRegionChange"],
   /*
     bindanchorpointtap、bindpoitap、bindupdated、bindlabeltap,-
     -,onInitComplete、onPanelTap
@@ -128,17 +129,17 @@ module.exports = [
     subkey、layer-style、enable-3D、enable-auto-max-overlooking,-
     special:  scale wx:[3-20 default:16] a:[5-18 default:16]
   */
-
+  
   // navigator
   /*
     target、app-id、path、extra-data、version、short-link、hover-stop-propagation、delta,-
     bindsuccess、bindfail、bindcomplate,-
   */
   // functional-page-navigator 无此标签
-
+  
   // 开放能力（组件）
   // web-view
-  ["bindmessage", "onMessage"],
+  ["bindmessage","onMessage"],
   // 内容号
   /*
     关注公众号 official-account https://developers.weixin.qq.com/miniprogram/dev/component/official-account.html
@@ -148,7 +149,7 @@ module.exports = [
   // 无此标签,error-view、contact-button、join-group-chat、subscribe-message
 
   // 页面属性配置节点 page-meta
-  ["bindscroll", "onScroll"],
+  ["bindscroll","onScroll"],
   /*
     background-text-style、page-orientation、bindresize、bindscrolldone
   */
@@ -160,14 +161,14 @@ module.exports = [
     -,动画监听事件,元素显示占比监听事件
   */
   // swpier
-  ["bindtransition", "onTransition"],
-  ["bindanimationfinish", "onAnimationEnd"],
+  ["bindtransition","onTransition"],
+  ["bindanimationfinish","onAnimationEnd"],
   /*
     -,active-class、changing-class、惯性跨屏滑动acceleration、disable-touch、swipe-ratio、swipe-speed、touch-angle、adjust-height、adjust-vertical-height
   */
   // scroll-view
-  ["bindscrolltoupper", "onScrollToUpper"],
-  ["bindscrolltolower", "onScrollToLower"],
+  ["bindscrolltoupper","onScrollToUpper"],
+  ["bindscrolltolower","onScrollToLower"],
   /*
     enable-flex、scroll-anchoring、enable-passive、自定义下拉刷新refresher-*、enhanced、bounces、show-scrollbar、paging-enabled、fast-deceleration,-
     binddrag-*
@@ -175,21 +176,21 @@ module.exports = [
   */
   // cover-view、cover-image、match-media、movable-area  [nothing to convert]
   // movable-view
-  ["bindscale", "onScale"],
+  ["bindscale","onScale"],
   /*
     htouchmove、vtouchmove,-
     -,onChangeEnd,
   */
   // page-container
-  ["bind:beforeenter", "onBeforeEnter"],
-  ["bind:enter", "onEnter"],
-  ["bind:afterenter", "onafterEnter"],
-  ["bind:beforeleave", "onBeforeLeave"],
-  ["bind:leave", "onLeave"],
-  ["bind:afterleave", "onAfterLeave"],
-  ["bind:clickoverlay", "onClickOverlay"],
+  ["bind:beforeenter","onBeforeEnter"],
+  ["bind:enter","onEnter"],
+  ["bind:afterenter","onafterEnter"],
+  ["bind:beforeleave","onBeforeLeave"],
+  ["bind:leave","onLeave"],
+  ["bind:afterleave","onAfterLeave"],
+  ["bind:clickoverlay","onClickOverlay"],
   // share-element
-  ["key", "name"],
+  ["key","name"],
   // root-portal 无差异
 
   // 原生组件 native-component 无此标签
@@ -199,7 +200,9 @@ module.exports = [
   // 无障碍 todo
 
   // xr-frame 无此标签
+  
+
 
   // wxs
-  ["module", "name"],
-];
+  ["module","name"]
+]

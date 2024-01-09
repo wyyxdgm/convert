@@ -4,9 +4,8 @@ function replaceProp(obj, f, t) {
 }
 module.exports = {
   // match 可以是函数、正则、字符
-  match: (f) => f.endsWith("/app.json"),
+  match: "app.json",
   parse(c, ctx) {
-    // 组织新的app.json结构
     obj = require(c.from);
     // console.log(`obj`, obj);
     obj["window"] = {
@@ -42,19 +41,18 @@ module.exports = {
       let packageEngineIndex = obj["subPackages"].findIndex((i) => i["root"] === "packageEngine");
       if (~packageEngineIndex) obj["subPackages"].splice(packageEngineIndex, 1);
     }
-    // 手动改改
-    // delete obj["plugins"]["plugin1"]; // = { provider: "2021003177669072", version: "0.0.2" };
-    // delete obj["plugins"]["plugin2"];
-    // delete obj["sitemapLocation"];
-    // // delete obj["subPackages"][0]["plugins"]["SPMallNavigation"];
-    // obj["plugins"]["plugin2"] = {
-    //   version: "*", // 0.0.6
-    //   provider: "202100317766xxxx",
-    // };
-    // obj["plugins"]["plugin1"] = {
-    //   version: "*", // 0.0.6
-    //   provider: "2021003177669072",
-    // };
+    delete obj["plugins"]["SPAREngine"]; // = { provider: "2021003177669072", version: "0.0.2" };
+    delete obj["plugins"]["SPARPlugin"];
+    delete obj["sitemapLocation"];
+    // delete obj["subPackages"][0]["plugins"]["SPMallNavigation"];
+    obj["plugins"]["SPARPlugin"] = {
+      version: "*", // 0.0.6
+      provider: "2021003177661066",
+    };
+    obj["plugins"]["SPAREngine"] = {
+      version: "*", // 0.0.6
+      provider: "2021003177669072",
+    };
     if (!obj["usingComponents"]) {
       obj["usingComponents"] = {};
     }

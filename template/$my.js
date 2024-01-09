@@ -5,6 +5,7 @@ class My {
 My.prototype = my;
 
 class CustomMy extends My {
+  eventManager = new BaseEvent();
   static getIns() {
     if (CustomMy.ins) return CustomMy.ins;
     CustomMy.ins = new CustomMy();
@@ -12,7 +13,6 @@ class CustomMy extends My {
   }
   constructor() {
     super();
-    this.eventManager = new BaseEvent();
   }
   debug = 0;
   isMy = true;

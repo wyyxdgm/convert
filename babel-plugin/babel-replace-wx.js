@@ -1,4 +1,4 @@
-const { resolveRelationDir } = require('../util');
+const { resolveRelationDir } = require('../config');
 module.exports = function ({ types: _t }) {
   return {
     visitor: {
@@ -35,7 +35,7 @@ module.exports = function ({ types: _t }) {
             if (!state.hasMyDone) {
               let { to } = state.opts.c;
               let { template } = state.opts.ctx.$.core;
-              let relativePath = resolveRelationDir(to, state.opts.ctx.config);
+              let relativePath = resolveRelationDir(to, state);
               relativePath += "/$my";
               const buildRequire = template(`import %%importName%% from %%source%%;`);
               const ast = buildRequire({

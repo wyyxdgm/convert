@@ -1,7 +1,5 @@
-const { existsSync, fstatSync } = require("fs-extra");
-const { resolveMiniProgramRelationTargetDir, resolveRelationTargetDir, resolveNpmPath } = require("./util");
-const path = require("path");
-const fs = require("fs");
+// wx27602f810c4ff00d
+const path = require('path');
 module.exports = [
   {
     match: (f, t, ctx) =>
@@ -12,7 +10,7 @@ module.exports = [
       !f.endsWith(`${path.sep}project.project.json`) &&
       !f.endsWith(`${path.sep}package-lock.json`) &&
       !f.endsWith(`${path.sep}package.json`), // match 可以是函数、正则、字符
-    parse(c, ctx, state) {
+    parse(c, ctx) {
       let bb = c.getStr();
       let obj = {};
       try {
@@ -32,32 +30,15 @@ module.exports = [
            * 替换插件
            */
           let vv = obj.usingComponents[originalComponentName];
-          if (~vv.indexOf("xxxxxxxxxxxxxxxxxx")) {
-            obj.usingComponents[originalComponentName] = vv.replace(/xxxxxxxxxxxxxxxxxx/g, "<TODO:插件名称>");
+          if (~vv.indexOf("wx27602f810c4ff00d") || ~vv.indexOf("wx513725758120fb69")) {
+            obj.usingComponents[originalComponentName] = vv.replace(
+              /wx27602f810c4ff00d|wx513725758120fb69/g,
+              "SPARPlugin"
+            );
           }
           if (~vv.indexOf("custom-tab-bar")) {
             delete obj.usingComponents[originalComponentName];
             //  = vv.replace("custom-tab-bar", "customize-tab-bar");
-          }
-          /**
-           * 相对路径修复
-           */
-          if (!vv.startsWith(".") && !vv.startsWith("/") && !~vv.indexOf(":")) {
-            let topLevelFolderName = vv.split("/")[0];
-            // 如果是npm包
-            if (ctx.config.dependencies[topLevelFolderName]) {
-              obj.usingComponents[originalComponentName] =
-                resolveMiniProgramRelationTargetDir(c.to, ctx.config) + "/" + vv; // 需要官方工具执行"npm构建"
-              // 文件夹
-              let p = resolveNpmPath(ctx.config, vv);
-              if (existsSync(p) && fs.statSync(p).isDirectory()) obj.usingComponents[originalComponentName] += "/index";
-              if (ctx.config.verbose)
-                console.log(`[json]替换miniprogram_npm依赖`, `${vv} -> ${obj.usingComponents[originalComponentName]}`);
-            } else {
-              obj.usingComponents[originalComponentName] = "./" + vv;
-              if (ctx.config.verbose)
-                console.log(`[json]替换相对路径依赖`, `${vv} -> ${obj.usingComponents[originalComponentName]}`);
-            }
           }
           /**
            * 收集大写组件
@@ -79,8 +60,13 @@ module.exports = [
             delete obj.usingComponents[originalComponentName];
           }
         }
+        // 最近在装修，打算再过个两个月就搬
       }
+      // "usingComponents": {
+      //   "clsclient": "plugin://wx27602f810c4ff00d/spar-clsvkclient",
+      //   "playcanvas": "plugin://wx27602f810c4ff00d/spar-playcanvas"
+      // },
       c.serialize = () => JSON.stringify(obj);
-    },
-  },
+    }
+  }
 ];

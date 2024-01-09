@@ -1,0 +1,1 @@
+export const noExt = (str: string) => str.substring(0, str.lastIndexOf('.'))

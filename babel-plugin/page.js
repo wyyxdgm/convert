@@ -1,32 +1,23 @@
-const { existsSync } = require("fs-extra");
 const {
   resolveRelationDir,
   resolveNpmLibRelationDir,
   unsupportDir,
   getAnimationKeyFromSelector,
   getStore,
-  resolveMiniProgramRelationDir,
-  existsNpmPath,
-} = require("../util");
-// --统计this.animate到unsupportDir--
-// const fs = require("fs");
-// const path = require("path");
-// if (!fs.existsSync(unsupportDir)) fs.mkdirSync(unsupportDir, { recursive: true });
-// const filePath = path.join(unsupportDir, "page-animate.js");
+} = require("../config");
+const fs = require("fs");
+const path = require("path");
+if (!fs.existsSync(unsupportDir)) fs.mkdirSync(unsupportDir, { recursive: true });
+const filePath = path.join(unsupportDir, "page-animate.js");
 const generate = require("@babel/generator").default;
-// fs.writeFileSync(filePath, "");
+fs.writeFileSync(filePath, "");
 
 module.exports = function ({ types: _t }) {
   return {
     visitor: {
       ImportDeclaration(path, state) {
+        // 处理引用"DataStorage"
         let v = path.get("source").node.value;
-
-        if (state.opts.ctx.config.dependencies[v]) {
-          let { to } = state.opts.c;
-          let relativePath = resolveMiniProgramRelationDir(to, state.opts.ctx.config);
-          path.get("source").node.value = relativePath + "/" + v;
-        }
         // .value;
         if (v.charAt(0) !== ".") {
           path.get("source").node.value = "./" + path.get("source").node.value;
@@ -39,16 +30,20 @@ module.exports = function ({ types: _t }) {
           console.log("⚠️  删除", generate(path.node).code);
           path.remove();
         }
-        // 替代一些npm依赖 -- 微信demo特定
-
-        if (~v.indexOf("./XrFrame")) {
-          console.log("⚠️  删除", generate(path.node).code);
-          path.remove();
-        }
-        if (~v.indexOf("./threejs-miniprogram")) {
+        if (~v.indexOf("/ar-nav-system-pc")) {
           let { to } = state.opts.c;
-          let relativePath = resolveMiniProgramRelationDir(to, state.opts.ctx.config);
-          path.get("source").node.value = relativePath + "/" + "threejs-miniprogram";
+          let relativePath = resolveNpmLibRelationDir(to, state);
+          path.get("source").node.value = relativePath + "/" + "ar-nav-system-pc.umd";
+        }
+        if (~v.indexOf("/tiny-runtime")) {
+          let { to } = state.opts.c;
+          let relativePath = resolveNpmLibRelationDir(to, state);
+          path.get("source").node.value = relativePath + "/" + "tiny-runtime.umd";
+        }
+        if (~v.indexOf("/tiny-ar-plugin")) {
+          let { to } = state.opts.c;
+          let relativePath = resolveNpmLibRelationDir(to, state);
+          path.get("source").node.value = relativePath + "/" + "tiny-ar-plugin.umd";
         }
       },
       MemberExpression(path) {
@@ -69,20 +64,13 @@ module.exports = function ({ types: _t }) {
         const { node } = path;
         let { c, ctx } = state.opts;
         // console.log(`node.callee`, node.callee);
-        // if (
-        //   _t.isMemberExpression(node.callee) &&
-        //   _t.isIdentifier(node.callee.property, { name: "animate" })
-        // )
-        // console.log(`node.callee.object.name-------------`, node.callee?.object, c.from);
-        // 处理animate
         if (
           _t.isMemberExpression(node.callee) &&
-          _t.isIdentifier(node.callee.object, { name: "this" }) &&
+          // _t.isIdentifier(node.callee.object, { name: "this" }) &&
           _t.isIdentifier(node.callee.property, { name: "animate" })
         ) {
-          // --统计this.animate到unsupportDir--
-          // let code = generate(node).code + ";\n";
-          // fs.writeFileSync(filePath, code, { flag: "a" });
+          let code = generate(node).code + ";\n";
+          fs.writeFileSync(filePath, code, { flag: "a" });
           if (path.node.arguments[0].type === "StringLiteral") {
             let selector = node.arguments[0].value;
             let animationKey = getAnimationKeyFromSelector(selector);
@@ -103,31 +91,6 @@ module.exports = function ({ types: _t }) {
             }
           } else {
             console.warn("[this.animate]不支持非字符形式的selector适配", generate(node).code);
-          }
-        }
-
-        if (path.node.callee.name == "require") {
-          const args = path.node.arguments;
-          let v = args[0].value;
-          if (v) {
-            if (state.opts.ctx.config.dependencies[v]) {
-              if (!existsNpmPath(state.opts.ctx.config, v)) {
-                console.warn(`[require]npm依赖声明但未安装 ${v}`);
-              }
-              let { to } = state.opts.c;
-              let relativePath = resolveMiniProgramRelationDir(to, state.opts.ctx.config);
-              args[0].value = relativePath + "/" + v;
-            } else if (!~v.indexOf(".")) {
-              if (
-                // 小程序目录内
-                state.opts.ctx.config.miniprogramRoot &&
-                ~state.opts.c.from.indexOf(state.opts.ctx.config.miniprogramRoot)
-              ) {
-                console.warn(`[require]npm依赖未声明 ${v}`);
-              }
-            } else {
-              // 相对路径
-            }
           }
         }
       },
@@ -155,7 +118,7 @@ module.exports = function ({ types: _t }) {
             if (!state.hasMyDone) {
               let { to } = state.opts.c;
               let { template } = state.opts.ctx.$.core;
-              let relativePath = resolveRelationDir(to, state.opts.ctx.config);
+              let relativePath = resolveRelationDir(to, state);
               relativePath += "/$my";
               const buildRequire = template(`import %%importName%% from %%source%%;`);
               const ast = buildRequire({
