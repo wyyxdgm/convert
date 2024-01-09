@@ -17,6 +17,19 @@ module.exports.resolveNpmLibRelationDir = function (to, state) {
 };
 
 module.exports.unsupportDir = join(__dirname, "./unsupport");
+let started = false;
+module.exports.appendUnsupport = function (file, code, remark = "") {
+  if (!started) {
+    let unsupportDir = module.exports.unsupportDir;
+    started = true;
+    if (!fs.existsSync(unsupportDir)) fs.mkdirSync(unsupportDir, { recursive: true });
+    fs.writeFileSync(path.join(unsupportDir, "unsupport.log"), ""); // clean
+  }
+  const filePath = path.join(unsupportDir, "unsupport.log");
+  fs.writeFileSync(filePath, `====================================\n[文件]${file}\n[说明]:${remark}\n[代码]\n${code}\n`, {
+    flag: "a",
+  });
+};
 
 // 将 animate(selector)中的`selector`选择器转化为页面更新动画的属性，具体页面更新 animation="{{返回值}}"
 module.exports.getAnimationKeyFromSelector = function (selector) {
