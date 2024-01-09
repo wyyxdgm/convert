@@ -2,19 +2,14 @@ const { existsSync } = require("fs-extra");
 const {
   resolveRelationDir,
   resolveNpmLibRelationDir,
-  unsupportDir,
   getAnimationKeyFromSelector,
   getStore,
   resolveMiniProgramRelationDir,
   existsNpmPath,
+  appendUnsupport,
 } = require("../util");
-// --统计this.animate到unsupportDir--
-// const fs = require("fs");
-// const path = require("path");
-// if (!fs.existsSync(unsupportDir)) fs.mkdirSync(unsupportDir, { recursive: true });
-// const filePath = path.join(unsupportDir, "page-animate.js");
+const fs = require("fs");
 const generate = require("@babel/generator").default;
-// fs.writeFileSync(filePath, "");
 
 module.exports = function ({ types: _t }) {
   return {
@@ -80,9 +75,6 @@ module.exports = function ({ types: _t }) {
           _t.isIdentifier(node.callee.object, { name: "this" }) &&
           _t.isIdentifier(node.callee.property, { name: "animate" })
         ) {
-          // --统计this.animate到unsupportDir--
-          // let code = generate(node).code + ";\n";
-          // fs.writeFileSync(filePath, code, { flag: "a" });
           if (path.node.arguments[0].type === "StringLiteral") {
             let selector = node.arguments[0].value;
             let animationKey = getAnimationKeyFromSelector(selector);
@@ -102,6 +94,7 @@ module.exports = function ({ types: _t }) {
               console.warn("[this.animate]无法解析selector适配", generate(node).code);
             }
           } else {
+            appendUnsupport(c.from, generate(node).code, "[this.animate]不支持非固定字符串形式的selector适配");
             console.warn("[this.animate]不支持非字符形式的selector适配", generate(node).code);
           }
         }
