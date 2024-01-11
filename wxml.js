@@ -44,7 +44,7 @@ function getNoIncludeWxml(rootDir, wxmlCode, wxmlPath) {
           } else {
             filePath = path.join(rootDir, src);
           }
-          let str = match.replace(src, path.relative(path.dirname(wxmlPath), filePath).replace(/\\/g, '/'));
+          let str = match.replace(src, path.relative(path.dirname(wxmlPath), filePath).replace(/\\/g, "/"));
           return str;
         });
       }
@@ -235,11 +235,12 @@ module.exports = [
 
 /**
  * @param {节点属性组成的对象} obj
- * @param {[oldKey,newkey,newValue | undefined]} AttrArray
+ * @param {Map<string,string>} attrMap [oldKey,newkey]
  */
-function batchReplace(obj, AttrArray) {
-  for (attr of AttrArray) {
-    replace(obj, ...attr);
+function batchReplace(obj, attrMap) {
+  for (oldkey in obj) {
+    let ro = attrMap.get(oldkey);
+    if (ro) replace(obj, oldkey, ro[1], ro[2]);
   }
 }
 

@@ -1,7 +1,7 @@
 /*
   微信wxml中的标签属性适配
 */
-module.exports = [
+const attrMap = [
   /*  微信   ->   支付宝  */
   // 基础事件
   ["bindtap", "onTap"],
@@ -181,13 +181,13 @@ module.exports = [
     -,onChangeEnd,
   */
   // page-container
-  ["bind:beforeenter", "onBeforeEnter"],
-  ["bind:enter", "onEnter"],
-  ["bind:afterenter", "onafterEnter"],
-  ["bind:beforeleave", "onBeforeLeave"],
-  ["bind:leave", "onLeave"],
-  ["bind:afterleave", "onAfterLeave"],
-  ["bind:clickoverlay", "onClickOverlay"],
+  ["bindbeforeenter", "onBeforeEnter"],
+  ["bindenter", "onEnter"],
+  ["bindafterenter", "onafterEnter"],
+  ["bindbeforeleave", "onBeforeLeave"],
+  ["bindleave", "onLeave"],
+  ["bindafterleave", "onAfterLeave"],
+  ["bindclickoverlay", "onClickOverlay"],
   // share-element
   ["key", "name"],
   // root-portal 无差异
@@ -201,5 +201,5 @@ module.exports = [
   // xr-frame 无此标签
 
   // wxs
-  ["module", "name"],
-];
+  ["module","name"]
+]
