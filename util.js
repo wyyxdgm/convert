@@ -5,7 +5,7 @@ module.exports.resolveRelationDir = function (to, config) {
   let pluginP = join(config.targetDir, config.pluginRoot);
   let miniprogramP = join(config.targetDir, config.miniprogramRoot);
   let relativePath = null;
-  if (pluginP && to.indexOf(pluginP) > -1) {
+  if (config.pluginRoot && to.indexOf(pluginP) > -1) {
     relativePath = join(relative(dirname(to), pluginP));
   } else {
     relativePath = join(relative(dirname(to), miniprogramP));
