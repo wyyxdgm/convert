@@ -83,12 +83,12 @@ module.exports = function ({ types: _t }) {
             if ((matchRes = selector.match(/^#(\S+)$/))) {
               // id
               key = matchRes[1];
-              let store = getStore(ctx, c.from.replace(/\.(j|t)s/, ".wxml"), "animateKey", Array);
+              let store = getStore(ctx, c.from.replace(/\.(j|t)s$/, ".wxml"), "animateKey", Array);
               store.push({ id: key, animationKey });
             } else if ((matchRes = selector.match(/^\.(\S+)$/))) {
               // class
               key = matchRes[1];
-              let store = getStore(ctx, c.from.replace(/\.(j|t)s/, ".wxml"), "animateKey", Array);
+              let store = getStore(ctx, c.from.replace(/\.(j|t)s$/, ".wxml"), "animateKey", Array);
               store.push({ class: key, animationKey });
             } else {
               console.warn("[this.animate]无法解析selector适配", generate(node).code);

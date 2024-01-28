@@ -214,8 +214,11 @@ module.exports = [
           if (animateKeyStore && animateKeyStore.length) {
             animateKeyStore.forEach((item) => {
               let needAppend = false;
-              if (item.id && item.id == node.id) {
-                if (item.id == node.id) needAppend = true;
+              // console.log(item.id , node.attributes?.id)
+              if (item.id) {
+                if (item.id == node.attributes?.id) {
+                  needAppend = true;
+                }
               } else if (item.class && node.attributes && node.attributes.class) {
                 let regex = new RegExp(`\\b${item.class}\\b`);
                 let hasClassName = regex.test(node.attributes.class);
