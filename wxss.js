@@ -1,9 +1,3 @@
-const types = {
-  "cover-image": 1,
-  image: 1,
-  button: 1,
-  picker: 1,
-};
 module.exports = [
   {
     name: "适配标签样式",
@@ -34,19 +28,6 @@ module.exports = [
         if (node.type == "Raw" && node.value.match(/^\s*\/\//)) {
           let i = node.value.indexOf("\n");
           node.value = i > -1 ? "\n" + node.value.substr(i) : " ";
-        }
-        if (node.type === "TypeSelector") {
-          if (node.name in types) {
-            let className = `_xxx_${node.name}`;
-            // console.log(`node.name`, node.name, c.from);
-            let ppath = c.from.replace(".wxss", ".wxml");
-            if (!ctx.store.has(ppath)) ctx.store.set(ppath, new Map());
-            let pstore = ctx.store.get(ppath);
-            let v = pstore.get("$appendClass") || {};
-            v[node.name] = className;
-            node.name = `.${className}`;
-            if (!pstore.has("$appendClass")) pstore.set("$appendClass", v);
-          }
         }
       });
       c.serialize = () =>

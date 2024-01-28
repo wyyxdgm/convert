@@ -1,4 +1,5 @@
 import $my from "./$my";
+$my.debug = 1;
 const transformRules = [
   [
     "properties",
@@ -10,6 +11,15 @@ const transformRules = [
       for (let key in properties) {
         let value = properties[key];
         if ("object" === typeof value) {
+          // observer
+          if (value.observer) {
+            let _ofn = value.observer;
+            if (!rootConfig.observers) rootConfig.observers = {};
+            rootConfig.observers[key] = function () {
+              _ofn && _ofn.apply(this, arguments);
+            };
+          }
+          // value
           if (value.hasOwnProperty("value")) props[key] = value.value;
           else if (value.type) {
             switch (value.type) {
@@ -88,7 +98,9 @@ function getAnimationKeyFromSelector(selector) {
   return selector.replace(/#|\.|\~/g, "").replace(/\-/g, "_") + "__animation";
 }
 function Adapter(type, c, typeStr, k, k2, k3) {
+  fixMap(type, c, typeStr, k, k2, k3);
   let o_ = c[k];
+  // 地图onMarkerTap
   c[k] = function () {
     if ($my.debug > 3)
       console.log(
@@ -114,7 +126,7 @@ function Adapter(type, c, typeStr, k, k2, k3) {
     };
     // https://developers.weixin.qq.com/miniprogram/dev/framework/view/animation.html#%E5%85%B3%E9%94%AE%E5%B8%A7%E5%8A%A8%E7%94%BB
     this.clearAnimation = function (selector, options, callback) {
-      // console.warn(`page.clearAnimation`, selector);
+      if ($my.debug > 5) console.warn(`/*${selector}*/this.setData({ ${getAnimationKeyFromSelector(selector)}: null })`);
       this.setData(
         {
           [getAnimationKeyFromSelector(selector)]: null,
@@ -128,13 +140,13 @@ function Adapter(type, c, typeStr, k, k2, k3) {
       // this.props[triggerKeyToMethodName(key)] && this.props[triggerKeyToMethodName(key)]({ detail: data });
     };
     this.animate = function (selector, keyframes, duration, callback) {
-      // console.log(`page.animate`, selector);
+      if ($my.debug > 1) console.log(`/*${selector}*/\nanimation = my.createAnimation()`);
       const animation = my.createAnimation();
 
       let prevOffset = 0; // 上一个关键帧的偏移值
 
       keyframes.forEach(function (keyframe, index) {
-        const offset = keyframe.offset || 0; // 当前关键帧的偏移值
+        const offset = keyframe.offset !== undefined ? keyframe.offset : index / (keyframes.length - 1); // 修改这里，自动计算 offset
         const currentDuration = (offset - prevOffset) * duration; // 当前关键帧的实际持续时间
 
         // 处理每个关键帧的属性
@@ -145,26 +157,28 @@ function Adapter(type, c, typeStr, k, k2, k3) {
 
           if (typeof animation[prop] === "function") {
             animation[prop](keyframe[prop]);
+            if ($my.debug > 1) console.log(`animation.${prop}(${keyframe[prop]})`);
           } else {
-            console.warn(`支付宝小程序不支持属性(${prop})`);
+            console.warn(`不支持animation.${prop}()`);
           }
         }
 
         // 添加当前关键帧的动画
-        animation.step({
+        let opt = {
           duration: currentDuration,
-          timeFunction: keyframe.timeFunction || "linear",
-          transformOrigin: keyframe.transformOrigin || "50% 50% 0",
-        });
+        };
+        if (keyframe.timeFunction) opt.timeFunction = keyframe.timeFunction;
+        if (keyframe.transformOrigin) opt.transformOrigin = keyframe.transformOrigin;
+        animation.step(opt);
+        if ($my.debug > 1) console.log(`animation.step(${JSON.stringify(opt)})`);
 
         prevOffset = offset;
       });
 
       // 导出动画并设置数据
-      const animationData = animation.export();
-      this.setData({
-        [getAnimationKeyFromSelector(selector)]: animationData,
-      });
+      const animationData = { [getAnimationKeyFromSelector(selector)]: animation.export() };
+      this.setData(animationData);
+      if ($my.debug > 1) console.log(`this.setData({ ${getAnimationKeyFromSelector(selector)}: animation.export() })`);
 
       // 使用 setTimeout 来检测动画是否完成
       setTimeout(function () {
@@ -404,6 +418,12 @@ function Adapter(type, c, typeStr, k, k2, k3) {
           _fn && _fn.apply(this, arguments);
         };
       }
+      if (!c.lifetimes) c.lifetimes = {};
+      let ready = c.lifetimes.ready;
+      c.lifetimes.ready = function () {
+        ready && ready.apply(this);
+        c.rootEvents["onShow"] && c.rootEvents["onShow"].apply(this);
+      };
     }
   }
 
@@ -464,4 +484,30 @@ export function $Page(config) {
 }
 export function $Component(config) {
   return Adapter(Component, config, "Component", "created", "didUnmount", "attached");
+}
+
+const markerTapRegExp = /markertap/i;
+function fixMap(type, c, typeStr, k, k2, k3) {
+  // c.*
+  for (const key in c) {
+    if (markerTapRegExp.test(key)) {
+      let _ofn = c[key];
+      c[key] = function (e) {
+        if (e && e.markerId) e.detail = { markerId: e.markerId };
+        _ofn.apply(this, arguments);
+      };
+    }
+  }
+  // c.methods.*
+  if (c.methods) {
+    for (const key in c.methods) {
+      if (markerTapRegExp.test(key)) {
+        let _ofn = c.methods[key];
+        c.methods[key] = function (e) {
+          if (e && e.markerId) e.detail = { markerId: e.markerId };
+          _ofn.apply(this, arguments);
+        };
+      }
+    }
+  }
 }

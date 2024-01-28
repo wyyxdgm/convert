@@ -39,6 +39,17 @@ wx-convert aplugin -v # 详细日志
 [wx-convert 使用文档](https://github.com/wyyxdgm/wx-convert#readme)
 [convert-miniprogram 使用文档](https://github.com/wyyxdgm/convert-miniprogram#readme)
 
+## 适配
+
+```js
+if (wx.isMy) {
+  // 支付宝小程序特有代码
+} else {
+  // 微信小程序特有代码
+}
+// 通用代码
+```
+
 ## 兼容性说明
 
 ### API

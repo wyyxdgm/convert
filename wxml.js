@@ -1,5 +1,13 @@
 const xmlAttr = require("./config/wxml-attr");
-const { appendClass, appendAttr, getStore, replaceChildArray, appendChildArray } = require("./util");
+const {
+  appendClass,
+  appendAttr,
+  getStore,
+  replaceChildArray,
+  appendChildArray,
+  replaceAttrKey,
+  setAttrValue,
+} = require("./util");
 const fs = require("fs");
 const path = require("path");
 /**
@@ -9,9 +17,7 @@ const path = require("path");
  * @param {*} wxmlCode wxml代码
  * @param {*} wxmlPath 当前wxml文件路径
  */
-let unincludeContent = new Map();
-function getNoIncludeWxml(rootDir, wxmlCode, wxmlPath) {
-  if (unincludeContent.has(wxmlPath)) return unincludeContent.get(wxmlPath);
+function getNoIncludeWxml(ctx, rootDir, wxmlCode, wxmlPath) {
   // 匹配include的正则，src='path'可能是单引号
   const reg = /<include\s+src=['"]([^'"]+)['"]\s*\/?>/g;
   // 处理 <include src="../../../../templates/playCanvaesVideo/playCanvaesVideo.axml" />
@@ -27,13 +33,11 @@ function getNoIncludeWxml(rootDir, wxmlCode, wxmlPath) {
       includePath = path.join(rootDir, includePath);
     }
     if (!includePath.endsWith(".wxml")) includePath += ".wxml";
-    let includeContent = fs.readFileSync(includePath, "utf-8");
+    ctx.addDep(wxmlPath, includePath);
+    let includeContent = ctx.getStr(includePath, true); // fs.readFileSync(includePath, "utf-8");
     if (includeContent) {
       // 递归处理include进来的wxml
-      includeContent = getNoIncludeWxml(rootDir, includeContent, includePath);
-      // 缓存
-      unincludeContent.set(wxmlPath, wxmlCode.replace(match[0], includeContent));
-      // 替换include标签
+      includeContent = getNoIncludeWxml(ctx, rootDir, includeContent, includePath);
       // 修正import引用路径
       if (importReg.test(includeContent)) {
         includeContent = includeContent.replace(importReg, (match) => {
@@ -48,6 +52,7 @@ function getNoIncludeWxml(rootDir, wxmlCode, wxmlPath) {
           return str;
         });
       }
+      // 替换include标签
       wxmlCode = wxmlCode.replace(match[0], includeContent);
     }
   }
@@ -85,7 +90,7 @@ module.exports = [
     parse(c, ctx) {
       const { wxml } = ctx.$;
       // 替换所有include标签
-      let newWxml = getNoIncludeWxml(ctx.config.fromDir, c.getStr(), c.from);
+      let newWxml = getNoIncludeWxml(ctx, ctx.config.fromDir, c.getStr(), c.from);
       if (newWxml) c.setStr(newWxml);
       if (c.getStr() != newWxml) debugger;
       if (~newWxml.indexOf("<include")) debugger;
@@ -117,18 +122,81 @@ module.exports = [
           node.attributes.src = node.attributes.src.replace(".wxml", ".axml");
         }
         if (node.tagName == "map") {
-          if (node.attributes["bindupdated"]) {
-            node.attributes["onInitComplete"] = node.attributes["bindupdated"];
-            delete node.attributes["bindupdated"];
-          }
-          if (node.attributes["bind:updated"]) {
-            node.attributes["onInitComplete"] = node.attributes["bind:updated"];
-            delete node.attributes["bind:updated"];
+          replaceAttrKey(node.attributes, "bindupdated", "onInitComplete");
+          replaceAttrKey(node.attributes, "bind:updated", "onInitComplete");
+          replaceAttrKey(node.attributes, "bindmarkertap", "onMarkerTap");
+          replaceAttrKey(node.attributes, "bind:markertap", "onMarkerTap");
+          if (node.attributes["onMarkerTap"]) {
+            if (!node.attributes["onMarkerTap"].match(/markertap/i)) {
+              console.warn(`[地图markertap事件]要求 ${c.from} 使用能匹配/markertap/i的方法名`);
+              // let fixMapStore = getStore(ctx, c.from.replace('.wxml', '.js'), "fixMap");
+              // fixMapStore.set('onMarkerTap', node.attributes['onMarkerTap']);
+            }
           }
           if (!node.attributes["optimize"]) {
             node.attributes["optimize"] = true;
           }
         }
+        if (node.tagName == "button") {
+          if (node.attributes["open-type"]) {
+            const openType = node.attributes["open-type"];
+            if (openType == "share") {
+              // 官方支持
+            } else if (openType === "getPhoneNumber") {
+              /**
+               * <button open-type="getPhoneNumber" onGetphonenumber="getPhoneNumber"></button>
+               * 改为
+               * <button open-type="getAuthorize" scope="phoneNumber" onGetPhoneNumber="getPhoneNumber"></button>;
+               */
+              setAttrValue(node.attributes, "open-type", "getAuthorize");
+              replaceAttrKey(node.attributes, "bind:getphonenumber", "onGetPhoneNumber");
+              replaceAttrKey(node.attributes, "bindgetphonenumber", "onGetPhoneNumber");
+              setAttrValue(node.attributes, "scope", "phoneNumber");
+            }
+            // <button open-type="agreePrivacyAuthorization"
+            // onAgreeprivacyauthorization="handleAgree"></button>
+            // <!-- 不支持 -->
+            else if (openType === "agreePrivacyAuthorization") {
+              console.warn(`[button open-type="agreePrivacyAuthorization"]不支持`);
+            }
+            // <button open-type="getUserInfo" onGetuserinfo="getuserinfo"></button>
+            // <!-- 替换|getuserinfo内部事件暂不用处理，使用getUserProfile判断没有直接走默认的button事件 -->
+            // <button open-type="getAuthorize" scope="userInfo" onGetUserInfo="getuserinfo"></button>
+            else if (openType === "getUserInfo") {
+              setAttrValue(node.attributes, "open-type", "getAuthorize");
+              setAttrValue(node.attributes, "scope", "userInfo");
+              replaceAttrKey(node.attributes, "bind:getuserinfo", "onGetUserInfo");
+              replaceAttrKey(node.attributes, "bindgetuserinfo", "onGetUserInfo");
+            } else {
+              console.warn(`[button open-type="${openType}"]待适配`);
+            }
+          }
+        }
+        if (node.tagName == "movable-area") {
+          // movable-area 不支持animation
+          // <movable-area animation="{{animationAr}}" catch:touchmove="prevent">
+          // 拼接父节点view，并绑定到父节点上
+          // <view animation="{{animationAr}}" catchTouchmove="prevent" style="position:absolute;z-index:200;" catchTouchmove="prevent">
+          // <movable-area >
+          if (node.attributes["animation"]) {
+            // 创建一个新的 "view" 节点，将 "icon" 节点移动到此新节点下
+            let viewNode = wxml.parse(`<view style="position:absolute;z-index:200;"></view>`)[0];
+            replaceChildArray(parent, node, viewNode, parsed); // childNodes
+            viewNode.attributes.animation = node.attributes["animation"];
+            delete node.attributes["animation"];
+            if (node.attributes["a:if"]) {
+              viewNode.attributes["a:if"] = node.attributes["a:if"];
+              delete node.attributes["a:if"];
+            }
+            // TODO 丰富适配，挪动相关事件
+            if (node.attributes["catch:touchmove"]) {
+              viewNode.attributes["catchTouchMove"] = node.attributes["catch:touchmove"];
+              delete node.attributes["catch:touchmove"];
+            }
+            appendChildArray(viewNode, node);
+          }
+        }
+
         if (node.tagName == "camera") {
           // <camera --- <camera id="camera"
           //标签名更改
@@ -190,20 +258,21 @@ module.exports = [
       if (ctx.store.has(c.from)) {
         let cstore = ctx.store.get(c.from);
         let $replaceTag = cstore.get("$replaceTag");
-        let $appendClass = cstore.get("$appendClass");
+        // let $appendClass = cstore.get("$appendClass");
         let animateKeyStore = getStore(ctx, c.from, "animateKey", false);
-        // console.log(`c.from-----`, c.from, types, ctx.store);
+        // console.log(`c.from----- `, c.from, types, ctx.store);
         const { wxml } = ctx.$;
-        wxml.traverse(c.parsed || wxml.parse(c.getStr()), function visitor(node, parent) {
+        c.parsed = c.parsed || wxml.parse(c.getStr()); // wxml.parse(c.serialize()) ||
+        wxml.traverse(c.parsed, function visitor(node, parent) {
           /**
            * appendClass
            */
-          if ($appendClass && $appendClass[node.tagName]) {
-            let className = $appendClass[node.tagName];
-            //标签名更改
-            // console.log("node.attributes.class", node.attributes.class);
-            appendClass(node, className);
-          }
+          // if ($appendClass && $appendClass[node.tagName]) {
+          //   let className = $appendClass[node.tagName];
+          //   //标签名更改
+          //   // console.log("node.attributes.class", node.attributes.class);
+          //   appendClass(node, className);
+          // }
           /**
            * replaceTag
            */
@@ -231,6 +300,7 @@ module.exports = [
             });
           }
         });
+        c.serialize = () => wxml.serialize(c.parsed);
       }
     },
   },

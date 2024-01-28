@@ -29,10 +29,12 @@ module.exports = function ({ types: _t }) {
         if (~v.indexOf("typings")) {
           console.log("⚠️  删除", generate(path.node).code);
           path.remove();
+          path = null;
         }
         if (~v.indexOf("recommend-routes-detail")) {
           console.log("⚠️  删除", generate(path.node).code);
           path.remove();
+          path = null;
         }
         // 替代一些npm依赖 -- 微信demo特定
 
@@ -44,6 +46,9 @@ module.exports = function ({ types: _t }) {
           let { to } = state.opts.c;
           let relativePath = resolveMiniProgramRelationDir(to, state.opts.ctx.config);
           path.get("source").node.value = relativePath + "/" + "threejs-miniprogram";
+        }
+        if (path && path.get("source").node.value.charAt(0) !== ".") {
+          path.get("source").node.value = "./" + path.get("source").node.value;
         }
       },
       MemberExpression(path) {

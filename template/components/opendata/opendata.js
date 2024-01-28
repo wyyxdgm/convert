@@ -23,7 +23,8 @@ $Component({
       "en":"英文",
       "zh-HK":"繁体中文-香港",
       "zh-Hant":"繁体中文-台湾"
-   }
+   },
+   Information:false
   },
   properties: {
     type: {
@@ -40,19 +41,36 @@ $Component({
   // didMount() {
   //   this.getUserInfo()
   // },
-  lifetimes: {
-    attached(){
-      this.getUserInfo()
+  pageLifetimes: {
+    show:function(){
+      my.getSetting({
+        success: res => {
+          if(res.authSetting['userInfo']){
+            this.setData({
+              Information:true
+            })
+            this.getUserInfo()
+          }
+          else{
+            this.setData({
+              Information:false
+            })
+          }
+        },
+        fail:r=>{
+          console.log(r)
+        }
+      });
     }
   },
   methods: {
-    getUserInfo() {
+    getUserInfo(userinfoRes) {
       return new Promise(async (resolve, reject) => {
         try {
           const [locationRes, userInfoRes, correctness] = await Promise.all([
             this.getLocation(),
-            this.getAuthUserInfo(),
-            this.validateImageLink(this.data.defaultAvatar)
+            userinfoRes ? Promise.resolve(userinfoRes) : this.getAuthUserInfo(),
+            this.validateImageLink(this.data.defaultAvatar),
           ]);
           const { country, province, city } = locationRes
           const { avatar, nickName } = userInfoRes;
@@ -111,7 +129,7 @@ $Component({
     },
     getAuthUserInfo() {
       return new Promise((resolve, reject) => {
-        $my.getAuthUserInfo({
+        $my.getOpenUserInfo({
           success: res => resolve(res),
           fail: error => reject(error)
         });
@@ -134,7 +152,22 @@ $Component({
           }
         });
       });
-    }
+    },
+    getOpenUserInfo() {
+      my.getOpenUserInfo({
+          success: (res) => {
+            this.setData({
+              Information:true
+            })
+            this.getUserInfo(res)
+          },
+          fail: (err) => {
+            this.setData({
+              Information:false
+            })
+          }
+      });
+  }
 
   }
 });

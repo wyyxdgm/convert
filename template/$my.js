@@ -51,7 +51,7 @@ class CustomMy extends My {
     this.eventManager.off("locationChange", fn);
     // console.warn("不支持 offLocationChange");
   }
-  startLocationUpdate(fn) {
+  startLocationUpdate(opt) {
     if (!this.locationeInterval) {
       this.locationeInterval = setInterval(() => {
         my.getLocation({
@@ -60,6 +60,20 @@ class CustomMy extends My {
         });
       }, 1000);
     }
+    // 首次获取位置
+    my.getLocation({
+      success: (res) => {
+        if (opt && typeof opt.success === "function") {
+          opt.success(res);
+        }
+      },
+      fail: (e) => {
+        if (opt && typeof opt.fail === "function") {
+          opt.fail(e);
+        }
+        console.warn("getLocation Error", e);
+      },
+    });
     // console.warn("不支持 startLocationUpdate");
   }
   stopLocationUpdate(opt) {
@@ -106,6 +120,56 @@ class CustomMy extends My {
       },
       ...options,
     });
+  }
+  _mapObjectKey(obj, fn) {
+    return Object.entries(obj).map(([k, v]) => [fn(k), v]).reduce((total, [k, v]) => {
+      total[k] = v;
+      return total;
+    }, {});
+  }
+  getSetting({ success, ...options }) {
+    my.getSetting({
+      success: ({ authSetting }) => {
+        success && success(
+          {
+            authSetting: {
+              ...this._mapObjectKey(authSetting, k => `scope.${k}`), // 默认全部加scope
+              "scope.userInfo": authSetting['userInfo'],
+              "scope.userLocation": authSetting['location'],
+              "scope.writePhotosAlbum": authSetting['writePhotosAlbum'],
+              "scope.camera": authSetting['camera'],
+              "scope.werun": authSetting['alipaysports'],
+              "scope.record": authSetting['audioRecord'],
+              // 其他授权项目适配，根据实际情况选择需要的授权
+            },
+            // 如果有订阅消息配置，需要将其适配结构进行映射
+            subscriptionsSetting: authSetting['subscriptionsSetting'] || {},
+          }
+        );
+      },
+      ...options,
+    });
+  }
+  getAppAuthorizeSetting({ success, ...options }) {
+    my.getSetting({
+      success: ({ authSetting }) => {
+        success && success(
+          {
+            app_authorize: {
+              "albumAuthorized": authSetting['album'],
+              "cameraAuthorized": authSetting['camera'],
+              "locationAuthorized": authSetting['location'],
+              "microphoneAuthorized": authSetting['audioRecord'],
+              // 其他授权项目适配，根据实际情况选择需要的授权
+            },
+          }
+        );
+      },
+      ...options,
+    });
+  }
+  getAppAuthorizeSetting() {
+    return my.getAppAuthorizeSetting();
   }
   getWindowInfo() {
     return my.getSystemInfoSync();

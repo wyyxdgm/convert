@@ -12,6 +12,7 @@ module.exports = {
     // 转
     // 支付宝：https://opendocs.alipay.com/mini/03dbc3
     let newObj = {
+      appid: '2021004105687121',
       enableAppxNg: true,
       format: 2,
       miniprogramRoot: obj.miniprogramRoot,

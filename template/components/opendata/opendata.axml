@@ -1,4 +1,14 @@
 <view class="{{className?'havaclass':'noneclass'}}">
+<button
+  open-type="getAuthorize"
+  scope="userInfo"
+  onGetAuthorize="getOpenUserInfo"
+  onError="handleAuthError"
+  style="width:100%;height:100%"
+  a:if="{{ !Information }}"
+>
+</button>
+<block a:if="{{Information}}">
   <view a:if="{{ type!='blank' &&type==='userAvatarUrl'}}"  class="imageclass">
     <image  a:if="{{ default }}"   src="{{avatar}}" class="cover-image" />
     <text a:else class="text-style">{{defaultText}}</text>
@@ -20,4 +30,5 @@
   <text a:if="{{ type!='blank' &&type==='userLanguage'}}" class="{{className}}">
     {{language}}
   </text>
+ </block>
 </view>

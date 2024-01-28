@@ -132,3 +132,15 @@ function appendChildArray(parent, node) {
   parent.childNodes.push(node);
 }
 module.exports.appendChildArray = appendChildArray;
+
+module.exports.replaceAttrKey = function (attr, fromProp, toProp) {
+  if (attr[fromProp]) {
+    attr[toProp] = attr[fromProp];
+    delete attr[fromProp];
+  }
+};
+
+function setAttrValue(attributes, k, v) {
+  return (attributes[k] = v);
+}
+module.exports.setAttrValue = setAttrValue;

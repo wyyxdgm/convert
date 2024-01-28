@@ -1,11 +1,12 @@
 /*
   微信wxml中的标签属性适配
 */
-const attrMap = [
+let attrMap = [
   /*  微信   ->   支付宝  */
   // 基础事件
   ["bindtap", "onTap"],
   ["catchtap", "catchTap"],
+  ["catch:tap", "catchTap"],
   ["binderror", "onError"],
   ["bindload", "onLoad"],
   ["bindlongpress", "onLongTap"],
@@ -117,7 +118,7 @@ const attrMap = [
 
   // map
   ["polygons", "polygon"],
-  ["bindmarkertap", "onMarkerTap"],
+  // ["bindmarkertap", "onMarkerTap"], // 有冲突，影响其他组件，缩小适配范围至map标签
   ["bindcallouttap", "onCalloutTap"],
   ["bindcontroltap", "onControlTap"],
   ["bindregionchange", "onRegionChange"],
@@ -201,5 +202,18 @@ const attrMap = [
   // xr-frame 无此标签
 
   // wxs
-  ["module","name"]
-]
+  ["module", "name"],
+];
+// ["bindxxx", "attr"] + ["bind:xxx", "attr"]
+attrMap = attrMap
+  .concat(
+    attrMap
+      .map(([v, v2]) => {
+        let idx = v.indexOf("bind");
+        if (idx > -1) return [v.replace("bind", "bind:"), v2];
+        return false;
+      })
+      .filter((o) => false !== o)
+  )
+  .map((arr) => [arr[0], arr]);
+module.exports = new Map(attrMap);
